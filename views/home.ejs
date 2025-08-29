@@ -3,128 +3,59 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
+    <title>URL Shortener</title>
     <style>
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        padding: 20px;
-        background: #f9fafb;
-        color: #333;
-      }
+      body { font-family: Arial, sans-serif; padding: 20px; background: #f9fafb; color: #333; }
+      h1 { text-align: center; color: #2563eb; }
+      form { max-width: 600px; margin: 20px auto; padding: 15px; background: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); display:flex; gap:10px; }
+      input[type="url"] { flex:1; padding:10px; border:1px solid #ccc; border-radius:5px; }
+      button { padding:10px 20px; background:#2563eb; color:white; border:none; border-radius:5px; cursor:pointer; }
+      button:hover { background:#1d4ed8; }
 
-      h1 {
-        text-align: center;
-        color: #2563eb;
-      }
-
-      form {
-        max-width: 500px;
-        margin: 20px auto;
-        padding: 20px;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      }
-
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-      }
-
-      input[type="url"] {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 12px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 15px;
-      }
-
-      button {
-        background: #2563eb;
-        color: white;
-        padding: 10px 16px;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background 0.3s ease;
-      }
-
-      button:hover {
-        background: #1d4ed8;
-      }
-
-      .result {
-        max-width: 500px;
-        margin: 25px auto;
-        padding: 20px;
-        background: #f1f5f9;
-        border-radius: 10px;
-        text-align: center;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        animation: fadeIn 0.5s ease-in-out;
-      }
-
-      .result p {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 10px;
-      }
-
-      .short-link {
-        display: inline-block;
-        padding: 10px 18px;
-        font-size: 16px;
-        font-weight: 500;
-        color: white;
-        background: #16a34a;
-        border-radius: 8px;
-        text-decoration: none;
-        transition: background 0.3s ease;
-      }
-
-      .short-link:hover {
-        background: #15803d;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
+      table { width: 100%; max-width: 800px; margin: 20px auto; border-collapse: collapse; background:white; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+      th, td { padding: 12px 15px; border:1px solid #ddd; text-align: center; }
+      th { background: #2563eb; color: white; }
+      tr:nth-child(even) { background: #f1f5f9; }
+      tr:hover { background: #e0e7ff; }
+      .short-link { color: #16a34a; text-decoration: none; font-weight:600; }
     </style>
   </head>
   <body>
     <h1>URL Shortener</h1>
 
-    <div>
-      <form method="post" action="/url">
-        <label for="url">Enter your original URL</label>
-        <input
-          type="url"
-          id="url"
-          name="url"
-          placeholder="http://example.com"
-          required
-        />
-        <button type="submit">Generate</button>
-      </form>
-    </div>
+    <!-- Form -->
+    <form method="post" action="/url">
+      <input type="url" name="url" placeholder="https://example.com" required />
+      <button type="submit">Generate</button>
+    </form>
 
-    <% if (typeof newUrl !== "undefined") { %>
-    <div class="result">
-      <p>🎉 Your short URL is ready!</p>
-      <a href="<%= newUrl %>" target="_blank" class="short-link"
-        ><%= newUrl %></a
-      >
-    </div>
+    <!-- Optional: Latest URL message -->
+    <% if (typeof newUrl !== "undefined" && newUrl) { %>
+      <p style="text-align:center; color:green; font-weight:600;">🎉 Your short URL is ready: <a href="<%= newUrl %>" target="_blank" class="short-link"><%= newUrl %></a></p>
+    <% } %>
+
+    <!-- URLs Table -->
+    <% if (urls && urls.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>S. No</th>
+            <th>ShortID</th>
+            <th>Redirect</th>
+            <th>Clicks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% urls.forEach((u, index) => { %>
+            <tr>
+              <td><%= index + 1 %></td>
+              <td><a href="/url/<%= u.shortId %>" target="_blank" class="short-link"><%= u.shortId %></a></td>
+              <td><%= u.redirectURL %></td>
+              <td><%= u.visitHistory.length %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
     <% } %>
   </body>
 </html>
